@@ -1,0 +1,8 @@
+[workspace]
+members = [ "day*" ]
+
+[workspace.package]
+version = "1.0.0"
+edition = "2021"
+authors = ["DLKJ"]
+license = "BSD-2-Clause"
