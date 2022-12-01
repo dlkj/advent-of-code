@@ -2,6 +2,11 @@ use std::num::ParseIntError;
 
 use itertools::Itertools;
 
+#[cfg(windows)]
+const DOUBLE_LINE_ENDING: &str = "\r\n\r\n";
+#[cfg(not(windows))]
+const LINE_ENDING: &str = "\n\n";
+
 fn main() -> Result<(), ParseIntError> {
     let input = include_str!("../input.txt");
 
@@ -11,18 +16,16 @@ fn main() -> Result<(), ParseIntError> {
 }
 
 fn solve(input: &str) -> Result<u32, ParseIntError> {
-    input
-        .lines()
-        .group_by(|&l| !l.is_empty())
+    let answer = input
+        .split(DOUBLE_LINE_ENDING)
+        .map(|s| s.lines().map(str::parse::<u32>).sum())
+        .collect::<Result<Vec<u32>, _>>()?
         .into_iter()
-        .filter_map(|(b, g)| b.then(|| g.map(str::parse::<u32>).sum()))
-        .collect::<Result<Vec<u32>, _>>()
-        .map(|v| {
-            v.into_iter()
-                .sorted_unstable_by(|a, b| b.cmp(a))
-                .take(3)
-                .sum()
-        })
+        .sorted_unstable_by(|a, b| b.cmp(a))
+        .take(3)
+        .sum();
+
+    Ok(answer)
 }
 
 #[cfg(test)]
