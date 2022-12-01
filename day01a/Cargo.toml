@@ -7,5 +7,4 @@ authors.workspace = true
 license.workspace = true
 
 [dependencies]
-anyhow = "1.0.66"
 itertools = "0.10.5"
