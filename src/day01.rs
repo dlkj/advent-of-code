@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use anyhow::Context;
 use itertools::Itertools;
 
@@ -15,7 +16,10 @@ pub fn solve_part_b() -> Result<u32, anyhow::Error> {
 }
 
 fn part_a(input: &str) -> Result<u32, anyhow::Error> {
-    Ok(sum_per_elf(input)?.into_iter().max().unwrap_or(0))
+    sum_per_elf(input)?
+        .into_iter()
+        .max()
+        .ok_or_else(|| anyhow!("No elfs found!"))
 }
 
 fn part_b(input: &str) -> Result<u32, anyhow::Error> {
