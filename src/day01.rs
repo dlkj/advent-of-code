@@ -5,7 +5,7 @@ use itertools::Itertools;
 #[cfg(windows)]
 const DOUBLE_LINE_ENDING: &str = "\r\n\r\n";
 #[cfg(not(windows))]
-const LINE_ENDING: &str = "\n\n";
+const DOUBLE_LINE_ENDING: &str = "\n\n";
 
 pub fn solve_part_a() -> Result<u32, anyhow::Error> {
     part_a(include_str!("../resources/input01a.txt"))
