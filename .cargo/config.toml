@@ -6,5 +6,6 @@ rustflags = [
     "-Wclippy::pedantic",
     "-Wclippy::nursery",
     "-Wclippy::unwrap_used",
-    "-Wclippy::expect_used"
+    "-Wclippy::expect_used",
+    "-Aclippy::missing-errors-doc"
 ]

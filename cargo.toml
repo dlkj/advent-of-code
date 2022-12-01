@@ -1,8 +1,18 @@
-[workspace]
-members = [ "day*" ]
+[package]
+name = "advent-of-code-2022"
 
-[workspace.package]
 version = "1.0.0"
 edition = "2021"
 authors = ["DLKJ"]
 license = "BSD-2-Clause"
+
+[dependencies]
+anyhow = "1.0"
+itertools = "0.10"
+
+[dev-dependencies]
+criterion = "0.4"
+
+[[bench]]
+name = "solution_benchmarks"
+harness = false
