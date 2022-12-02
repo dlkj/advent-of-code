@@ -9,5 +9,13 @@ fn day01b(c: &mut Criterion) {
     c.bench_function("day01b", |b| b.iter(day01::solve_part_b));
 }
 
-criterion_group!(benches, day01a, day01b);
+fn day02a(c: &mut Criterion) {
+    c.bench_function("day02a", |b| b.iter(day02::solve_part_a));
+}
+
+fn day02b(c: &mut Criterion) {
+    c.bench_function("day02b", |b| b.iter(day02::solve_part_b));
+}
+
+criterion_group!(benches, day01a, day01b, day02a, day02b);
 criterion_main!(benches);

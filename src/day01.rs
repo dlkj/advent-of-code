@@ -8,11 +8,11 @@ const DOUBLE_LINE_ENDING: &str = "\r\n\r\n";
 const DOUBLE_LINE_ENDING: &str = "\n\n";
 
 pub fn solve_part_a() -> Result<u32, anyhow::Error> {
-    part_a(include_str!("../resources/input01a.txt"))
+    part_a(include_str!("../resources/input01.txt"))
 }
 
 pub fn solve_part_b() -> Result<u32, anyhow::Error> {
-    part_b(include_str!("../resources/input01b.txt"))
+    part_b(include_str!("../resources/input01.txt"))
 }
 
 fn part_a(input: &str) -> Result<u32, anyhow::Error> {
@@ -45,13 +45,13 @@ mod tests {
     use super::*;
     #[test]
     fn example_a() -> Result<(), anyhow::Error> {
-        assert_eq!(part_a(include_str!("../resources/example01a.txt"))?, 24000);
+        assert_eq!(part_a(include_str!("../resources/example01.txt"))?, 24000);
         Ok(())
     }
 
     #[test]
     fn example_b() -> Result<(), anyhow::Error> {
-        assert_eq!(part_b(include_str!("../resources/example01b.txt"))?, 45000);
+        assert_eq!(part_b(include_str!("../resources/example01.txt"))?, 45000);
         Ok(())
     }
 }
