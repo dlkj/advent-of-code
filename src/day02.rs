@@ -115,21 +115,21 @@ mod parser {
     }
 
     fn guide(input: &str) -> IResult<&str, Vec<(Play, Recommended)>> {
-        separated_list1(line_ending, guide_item)(input)
+        separated_list1(line_ending, line)(input)
     }
 
-    fn guide_item(input: &str) -> IResult<&str, (Play, Recommended)> {
-        separated_pair(opponent_play, char(' '), recommended_play)(input)
+    fn line(input: &str) -> IResult<&str, (Play, Recommended)> {
+        separated_pair(play, char(' '), recommended)(input)
     }
 
-    fn opponent_play(input: &str) -> IResult<&str, Play> {
+    fn play(input: &str) -> IResult<&str, Play> {
         alt((
             value(Play::Rock, char('A')),
             value(Play::Paper, char('B')),
             value(Play::Scissors, char('C')),
         ))(input)
     }
-    fn recommended_play(input: &str) -> IResult<&str, Recommended> {
+    fn recommended(input: &str) -> IResult<&str, Recommended> {
         alt((
             value(Recommended::X, char('X')),
             value(Recommended::Y, char('Y')),
