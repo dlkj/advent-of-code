@@ -1,3 +1,5 @@
+use itertools::Itertools;
+
 use self::parser::parse;
 
 const INPUT: &str = include_str!("../resources/input02.txt");
@@ -59,50 +61,49 @@ pub fn solve_part_b() -> Result<u32, anyhow::Error> {
 }
 
 fn part_a(input: &str) -> Result<u32, anyhow::Error> {
-    let guide = parse(input)?;
-
-    let answer = guide
-        .into_iter()
-        .map(|(op, rec)| {
-            let rec_play = match rec {
-                Recommended::X => Play::Rock,
-                Recommended::Y => Play::Paper,
-                Recommended::Z => Play::Scissors,
-            };
-
-            rec_play.outcome(op) as u32 + (rec_play as u32)
-        })
-        .sum();
+    let answer = input
+        .lines()
+        .map(parse)
+        .map_ok(play_recommended)
+        .fold_ok(0, std::ops::Add::add)?;
 
     Ok(answer)
 }
 
 fn part_b(input: &str) -> Result<u32, anyhow::Error> {
-    let guide = parse(input)?;
-
-    let answer = guide
-        .into_iter()
-        .map(|(op, rec)| {
-            let (rec_outcome, rec_play) = match rec {
-                Recommended::X => (Outcome::Loss, op.win()),
-                Recommended::Y => (Outcome::Draw, op),
-                Recommended::Z => (Outcome::Win, op.lose()),
-            };
-
-            (rec_play as u32) + (rec_outcome as u32)
-        })
-        .sum();
+    let answer = input
+        .lines()
+        .map(parse)
+        .map_ok(play_for_outcome)
+        .fold_ok(0, std::ops::Add::add)?;
 
     Ok(answer)
 }
 
+fn play_recommended((op, rec): (Play, Recommended)) -> u32 {
+    let rec_play = match rec {
+        Recommended::X => Play::Rock,
+        Recommended::Y => Play::Paper,
+        Recommended::Z => Play::Scissors,
+    };
+    rec_play.outcome(op) as u32 + (rec_play as u32)
+}
+
+const fn play_for_outcome((op, rec): (Play, Recommended)) -> u32 {
+    let (rec_outcome, rec_play) = match rec {
+        Recommended::X => (Outcome::Loss, op.win()),
+        Recommended::Y => (Outcome::Draw, op),
+        Recommended::Z => (Outcome::Win, op.lose()),
+    };
+    (rec_play as u32) + (rec_outcome as u32)
+}
+
 mod parser {
     use nom::branch::alt;
+    use nom::bytes::complete::tag;
     use nom::character::complete::char;
-    use nom::character::complete::line_ending;
     use nom::combinator::value;
     use nom::error::Error;
-    use nom::multi::separated_list1;
     use nom::sequence::separated_pair;
     use nom::IResult;
     use nom_supreme::final_parser::final_parser;
@@ -110,16 +111,12 @@ mod parser {
     use super::Play;
     use super::Recommended;
 
-    pub(super) fn parse(input: &str) -> Result<Vec<(Play, Recommended)>, Error<String>> {
-        final_parser(guide)(input).map_err(|e: Error<&str>| Error::new(e.input.to_owned(), e.code))
-    }
-
-    fn guide(input: &str) -> IResult<&str, Vec<(Play, Recommended)>> {
-        separated_list1(line_ending, line)(input)
+    pub(super) fn parse(input: &str) -> Result<(Play, Recommended), Error<String>> {
+        final_parser(line)(input).map_err(|e: Error<&str>| Error::new(e.input.to_owned(), e.code))
     }
 
     fn line(input: &str) -> IResult<&str, (Play, Recommended)> {
-        separated_pair(play, char(' '), recommended)(input)
+        separated_pair(play, tag(" "), recommended)(input)
     }
 
     fn play(input: &str) -> IResult<&str, Play> {

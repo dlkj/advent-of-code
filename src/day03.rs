@@ -14,10 +14,7 @@ pub fn solve_part_b() -> Result<u32, anyhow::Error> {
 fn part_a(input: &str) -> Result<u32, anyhow::Error> {
     input
         .lines()
-        .map(|l| {
-            let bitmap = str_to_bitmap(&l[..l.len() / 2])?;
-            find_first_common(&l[l.len() / 2..], bitmap)
-        })
+        .map(find_first_common_between_halves)
         .fold_ok(0, std::ops::Add::add)
 }
 
@@ -25,12 +22,18 @@ fn part_b(input: &str) -> Result<u32, anyhow::Error> {
     input
         .lines()
         .tuples()
-        .map(|(a, b, c)| {
-            let bitmap = str_to_bitmap(a)? & str_to_bitmap(b)?;
-
-            find_first_common(c, bitmap)
-        })
+        .map(find_first_common_to_three)
         .fold_ok(0, std::ops::Add::add)
+}
+
+fn find_first_common_between_halves(l: &str) -> Result<u32, anyhow::Error> {
+    let bitmap = str_to_bitmap(&l[..l.len() / 2])?;
+    find_first_common(&l[l.len() / 2..], bitmap)
+}
+
+fn find_first_common_to_three((a, b, c): (&str, &str, &str)) -> Result<u32, anyhow::Error> {
+    let bitmap = str_to_bitmap(a)? & str_to_bitmap(b)?;
+    find_first_common(c, bitmap)
 }
 
 fn find_first_common(s: &str, bitmap: u64) -> Result<u32, anyhow::Error> {

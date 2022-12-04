@@ -27,19 +27,22 @@ fn part_b(input: &str) -> Result<u32, anyhow::Error> {
     let a = input
         .lines()
         .map(parse)
-        .filter_ok(overlap)
+        .filter_ok(overlaps)
         .fold_ok(0, |a, _| a + 1)?;
 
     Ok(a)
 }
 
 fn contains((a, b): &(RangeInclusive<u32>, RangeInclusive<u32>)) -> bool {
-    (a.contains(b.start()) && a.contains(b.end())) || (b.contains(a.start()) && b.contains(a.end()))
+    if a.end() - a.start() > b.end() - b.start() {
+        a.start() <= b.start() && a.end() >= b.end()
+    } else {
+        b.start() <= a.start() && b.end() >= a.end()
+    }
 }
 
-fn overlap(r: &(RangeInclusive<u32>, RangeInclusive<u32>)) -> bool {
-    let (a, b) = r;
-    a.contains(b.start()) || a.contains(b.end()) || contains(r)
+fn overlaps((a, b): &(RangeInclusive<u32>, RangeInclusive<u32>)) -> bool {
+    a.end() >= b.start() && a.start() <= b.end()
 }
 
 mod parser {
