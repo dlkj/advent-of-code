@@ -16,6 +16,7 @@ fn day02a(c: &mut Criterion) {
 fn day02b(c: &mut Criterion) {
     c.bench_function("day02b", |b| b.iter(day02::solve_part_b));
 }
+
 fn day03a(c: &mut Criterion) {
     c.bench_function("day03a", |b| b.iter(day03::solve_part_a));
 }
@@ -24,5 +25,13 @@ fn day03b(c: &mut Criterion) {
     c.bench_function("day03b", |b| b.iter(day03::solve_part_b));
 }
 
-criterion_group!(benches, day01a, day01b, day02a, day02b, day03a, day03b);
+fn day04a(c: &mut Criterion) {
+    c.bench_function("day04a", |b| b.iter(day04::solve_part_a));
+}
+
+fn day04b(c: &mut Criterion) {
+    c.bench_function("day04b", |b| b.iter(day04::solve_part_b));
+}
+
+criterion_group!(benches, day01a, day01b, day02a, day02b, day03a, day03b, day04a, day04b);
 criterion_main!(benches);
