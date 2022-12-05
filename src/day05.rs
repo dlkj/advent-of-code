@@ -80,12 +80,14 @@ fn parse_input(input: &str) -> Result<(Vec<Vec<Crate>>, Vec<Instruction>), anyho
 mod parser {
     use anyhow::anyhow;
     use nom::branch::alt;
-    use nom::character::complete::{digit1, satisfy};
-    use nom::combinator::{map, map_res, value};
+    use nom::character::complete::satisfy;
+    use nom::combinator::{map, value};
     use nom::multi::separated_list1;
+    use nom::sequence::tuple;
     use nom::AsChar;
-    use nom::{bytes::complete::tag, error::Error, sequence::delimited, IResult};
-    use nom_supreme::final_parser::final_parser;
+    use nom::{bytes::complete::tag, sequence::delimited, IResult};
+
+    use crate::{dec_int, final_parser};
 
     use super::{Crate, Instruction};
 
@@ -97,15 +99,14 @@ mod parser {
             .ok_or_else(|| anyhow!("unable to read location stack numbers input"))?;
 
         let mut stacks = Vec::new();
-        for _ in final_parser(stack_numbers)(stack_numbers_input)
-            .map_err(|e: Error<&str>| Error::new(e.input.to_owned(), e.code))?
-        {
-            stacks.push(Vec::new());
-        }
+        stacks.extend(
+            final_parser(stack_numbers)(stack_numbers_input)?
+                .into_iter()
+                .map(|_| Vec::new()),
+        );
 
         for line in lines {
-            let crates = final_parser(crates)(line)
-                .map_err(|e: Error<&str>| Error::new(e.input.to_owned(), e.code))?;
+            let crates = final_parser(crates)(line)?;
 
             for c in crates.into_iter().enumerate() {
                 if let (i, Some(c)) = c {
@@ -137,27 +138,23 @@ mod parser {
     }
 
     pub(super) fn parse_instructions(input: &str) -> Result<Vec<Instruction>, anyhow::Error> {
-        Ok(input
+        input
             .lines()
-            .map(|l| {
-                final_parser(instruction)(l)
-                    .map_err(|e: Error<&str>| Error::new(e.input.to_owned(), e.code))
-            })
-            .collect::<Result<Vec<_>, _>>()?)
+            .map(|l| final_parser(instruction)(l))
+            .collect::<Result<Vec<_>, _>>()
     }
 
     fn instruction(input: &str) -> IResult<&str, Instruction> {
-        let (input, _) = tag("move ")(input)?;
-        let (input, count) = usize_dec(input)?;
-        let (input, _) = tag(" from ")(input)?;
-        let (input, from) = usize_dec(input)?;
-        let (input, _) = tag(" to ")(input)?;
-        let (input, to) = usize_dec(input)?;
-        Ok((input, Instruction { count, from, to }))
-    }
+        let (input, (_, count, _, from, _, to)) = tuple((
+            tag("move "),
+            dec_int,
+            tag(" from "),
+            dec_int,
+            tag(" to "),
+            dec_int,
+        ))(input)?;
 
-    fn usize_dec(input: &str) -> IResult<&str, usize> {
-        map_res(digit1, str::parse)(input)
+        Ok((input, Instruction { count, from, to }))
     }
 }
 

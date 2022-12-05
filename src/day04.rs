@@ -14,23 +14,19 @@ pub fn solve_part_b() -> Result<u32, anyhow::Error> {
 }
 
 fn part_a(input: &str) -> Result<u32, anyhow::Error> {
-    let a = input
+    input
         .lines()
         .map(parse)
         .filter_ok(contains)
-        .fold_ok(0, |a, _| a + 1)?;
-
-    Ok(a)
+        .fold_ok(0, |a, _| a + 1)
 }
 
 fn part_b(input: &str) -> Result<u32, anyhow::Error> {
-    let a = input
+    input
         .lines()
         .map(parse)
         .filter_ok(overlaps)
-        .fold_ok(0, |a, _| a + 1)?;
-
-    Ok(a)
+        .fold_ok(0, |a, _| a + 1)
 }
 
 fn contains((a, b): &(RangeInclusive<u32>, RangeInclusive<u32>)) -> bool {
@@ -48,20 +44,14 @@ fn overlaps((a, b): &(RangeInclusive<u32>, RangeInclusive<u32>)) -> bool {
 mod parser {
     use std::ops::RangeInclusive;
 
-    use nom::{
-        bytes::complete::tag,
-        character::complete::digit1,
-        combinator::{map, map_res},
-        error::Error,
-        sequence::separated_pair,
-        IResult,
-    };
-    use nom_supreme::final_parser::final_parser;
+    use nom::{bytes::complete::tag, combinator::map, sequence::separated_pair, IResult};
+
+    use crate::{dec_int, final_parser};
 
     pub(super) fn parse(
         input: &str,
-    ) -> Result<(RangeInclusive<u32>, RangeInclusive<u32>), Error<String>> {
-        final_parser(line)(input).map_err(|e: Error<&str>| Error::new(e.input.to_owned(), e.code))
+    ) -> Result<(RangeInclusive<u32>, RangeInclusive<u32>), anyhow::Error> {
+        final_parser(line)(input)
     }
 
     fn line(input: &str) -> IResult<&str, (RangeInclusive<u32>, RangeInclusive<u32>)> {
@@ -69,13 +59,9 @@ mod parser {
     }
 
     fn range(input: &str) -> IResult<&str, RangeInclusive<u32>> {
-        map(separated_pair(u32_dec, tag("-"), u32_dec), |(a, b)| {
+        map(separated_pair(dec_int, tag("-"), dec_int), |(a, b)| {
             RangeInclusive::new(a, b)
         })(input)
-    }
-
-    fn u32_dec(input: &str) -> IResult<&str, u32> {
-        map_res(digit1, str::parse)(input)
     }
 }
 

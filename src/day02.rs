@@ -103,16 +103,16 @@ mod parser {
     use nom::bytes::complete::tag;
     use nom::character::complete::char;
     use nom::combinator::value;
-    use nom::error::Error;
     use nom::sequence::separated_pair;
     use nom::IResult;
-    use nom_supreme::final_parser::final_parser;
+
+    use crate::final_parser;
 
     use super::Play;
     use super::Recommended;
 
-    pub(super) fn parse(input: &str) -> Result<(Play, Recommended), Error<String>> {
-        final_parser(line)(input).map_err(|e: Error<&str>| Error::new(e.input.to_owned(), e.code))
+    pub(super) fn parse(input: &str) -> Result<(Play, Recommended), anyhow::Error> {
+        final_parser(line)(input)
     }
 
     fn line(input: &str) -> IResult<&str, (Play, Recommended)> {
