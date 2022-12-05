@@ -4,10 +4,7 @@ use std::num::ParseIntError;
 use anyhow::anyhow;
 use anyhow::Context;
 
-#[cfg(windows)]
-const DOUBLE_LINE_ENDING: &str = "\r\n\r\n";
-#[cfg(not(windows))]
-const DOUBLE_LINE_ENDING: &str = "\n\n";
+use crate::DOUBLE_LINE_ENDING;
 
 pub fn solve_part_a() -> Result<u32, anyhow::Error> {
     part_a(include_str!("../resources/input01.txt"))
