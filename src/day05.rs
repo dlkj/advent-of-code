@@ -80,6 +80,7 @@ fn parse_input(input: &str) -> Result<(Vec<Vec<Crate>>, Vec<Instruction>), anyho
 mod parser {
     use anyhow::anyhow;
     use nom::branch::alt;
+    use nom::character::complete::line_ending;
     use nom::character::complete::satisfy;
     use nom::combinator::{map, value};
     use nom::multi::separated_list1;
@@ -138,10 +139,7 @@ mod parser {
     }
 
     pub(super) fn parse_instructions(input: &str) -> Result<Vec<Instruction>, anyhow::Error> {
-        input
-            .lines()
-            .map(|l| final_parser(instruction)(l))
-            .collect::<Result<Vec<_>, _>>()
+        final_parser(separated_list1(line_ending, instruction))(input)
     }
 
     fn instruction(input: &str) -> IResult<&str, Instruction> {
