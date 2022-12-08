@@ -7,6 +7,7 @@ pub mod day04;
 pub mod day05;
 pub mod day06;
 pub mod day07;
+pub mod day08;
 
 #[cfg(windows)]
 const DOUBLE_LINE_ENDING: &str = "\r\n\r\n";
