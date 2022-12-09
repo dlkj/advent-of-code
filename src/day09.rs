@@ -23,18 +23,9 @@ fn part_a(input: &str) -> Result<usize, anyhow::Error> {
         .into_iter()
         .flat_map(|(d, c)| repeat_n(d, c as usize))
         // head locations
-        .scan((0, 0), |(x, y), d| {
-            match d {
-                Direction::Right => *x += 1,
-                Direction::Left => *x -= 1,
-                Direction::Up => *y += 1,
-                Direction::Down => *y -= 1,
-            };
-
-            Some((*x, *y))
-        })
+        .scan((0, 0), scan_head)
         // tail locations
-        .scan((0, 0), calc_tail)
+        .scan((0, 0), scan_tail)
         // drop duplicates
         .unique()
         .count();
@@ -47,26 +38,17 @@ fn part_b(input: &str) -> Result<usize, anyhow::Error> {
         .into_iter()
         .flat_map(|(d, c)| repeat_n(d, c as usize))
         // head locations
-        .scan((0, 0), |(x, y), d| {
-            match d {
-                Direction::Right => *x += 1,
-                Direction::Left => *x -= 1,
-                Direction::Up => *y += 1,
-                Direction::Down => *y -= 1,
-            };
-
-            Some((*x, *y))
-        })
+        .scan((0, 0), scan_head)
         // tail locations for 9 other knots
-        .scan((0, 0), calc_tail)
-        .scan((0, 0), calc_tail)
-        .scan((0, 0), calc_tail)
-        .scan((0, 0), calc_tail)
-        .scan((0, 0), calc_tail)
-        .scan((0, 0), calc_tail)
-        .scan((0, 0), calc_tail)
-        .scan((0, 0), calc_tail)
-        .scan((0, 0), calc_tail)
+        .scan((0, 0), scan_tail)
+        .scan((0, 0), scan_tail)
+        .scan((0, 0), scan_tail)
+        .scan((0, 0), scan_tail)
+        .scan((0, 0), scan_tail)
+        .scan((0, 0), scan_tail)
+        .scan((0, 0), scan_tail)
+        .scan((0, 0), scan_tail)
+        .scan((0, 0), scan_tail)
         // drop duplicates
         .unique()
         .count();
@@ -75,9 +57,20 @@ fn part_b(input: &str) -> Result<usize, anyhow::Error> {
 }
 
 #[allow(clippy::unnecessary_wraps)]
-fn calc_tail((tx, ty): &mut (i32, i32), (hx, hy): (i32, i32)) -> Option<(i32, i32)> {
-    if (-1..=1).contains(&(*tx - hx)) && (-1..=1).contains(&(*ty - hy)) {
-    } else {
+fn scan_head((x, y): &mut (i32, i32), d: Direction) -> Option<(i32, i32)> {
+    match d {
+        Direction::Right => *x += 1,
+        Direction::Left => *x -= 1,
+        Direction::Up => *y += 1,
+        Direction::Down => *y -= 1,
+    };
+
+    Some((*x, *y))
+}
+
+#[allow(clippy::unnecessary_wraps)]
+fn scan_tail((tx, ty): &mut (i32, i32), (hx, hy): (i32, i32)) -> Option<(i32, i32)> {
+    if !((-1..=1).contains(&(*tx - hx)) && (-1..=1).contains(&(*ty - hy))) {
         *tx -= num::clamp(*tx - hx, -1, 1);
         *ty -= num::clamp(*ty - hy, -1, 1);
     }

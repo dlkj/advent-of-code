@@ -1,4 +1,4 @@
-use itertools::Itertools;
+use itertools::{process_results, Itertools};
 
 use self::parser::parse;
 
@@ -61,21 +61,17 @@ pub fn solve_part_b() -> Result<u32, anyhow::Error> {
 }
 
 fn part_a(input: &str) -> Result<u32, anyhow::Error> {
-    let answer = input
-        .lines()
-        .map(parse)
-        .map_ok(play_recommended)
-        .fold_ok(0, std::ops::Add::add)?;
+    let answer = process_results(input.lines().map(parse).map_ok(play_recommended), |i| {
+        i.sum()
+    })?;
 
     Ok(answer)
 }
 
 fn part_b(input: &str) -> Result<u32, anyhow::Error> {
-    let answer = input
-        .lines()
-        .map(parse)
-        .map_ok(play_for_outcome)
-        .fold_ok(0, std::ops::Add::add)?;
+    let answer = process_results(input.lines().map(parse).map_ok(play_for_outcome), |i| {
+        i.sum()
+    })?;
 
     Ok(answer)
 }

@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use itertools::Itertools;
+use itertools::{process_results, Itertools};
 
 const INPUT: &str = include_str!("../resources/input03.txt");
 
@@ -12,18 +12,17 @@ pub fn solve_part_b() -> Result<u32, anyhow::Error> {
 }
 
 fn part_a(input: &str) -> Result<u32, anyhow::Error> {
-    input
-        .lines()
-        .map(find_first_common_between_halves)
-        .fold_ok(0, std::ops::Add::add)
+    process_results(input.lines().map(find_first_common_between_halves), |i| {
+        i.sum()
+    })
 }
 
 fn part_b(input: &str) -> Result<u32, anyhow::Error> {
-    input
-        .lines()
-        .tuples()
-        .map(find_first_common_to_three)
-        .fold_ok(0, std::ops::Add::add)
+    #[allow(clippy::redundant_closure_for_method_calls)]
+    process_results(
+        input.lines().tuples().map(find_first_common_to_three),
+        |i| i.sum(),
+    )
 }
 
 fn find_first_common_between_halves(l: &str) -> Result<u32, anyhow::Error> {

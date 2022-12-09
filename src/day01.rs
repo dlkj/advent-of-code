@@ -2,7 +2,8 @@ use std::cmp::Reverse;
 use std::num::ParseIntError;
 
 use anyhow::anyhow;
-use anyhow::Context;
+use itertools::process_results;
+use itertools::Itertools;
 
 use crate::DOUBLE_LINE_ENDING;
 
@@ -15,24 +16,18 @@ pub fn solve_part_b() -> Result<u32, anyhow::Error> {
 }
 
 fn part_a(input: &str) -> Result<u32, anyhow::Error> {
-    parse(input)?
-        .into_iter()
-        .max()
-        .ok_or_else(|| anyhow!("No elfs found!"))
+    process_results(parse(input), |i| i.max())?.ok_or_else(|| anyhow!("No elfs found!"))
 }
 
 fn part_b(input: &str) -> Result<u32, anyhow::Error> {
-    let mut sums = parse(input)?;
-    sums.sort_by_key(|k| Reverse(*k));
-    Ok(sums.into_iter().take(3).sum())
+    let results = process_results(parse(input), |sums| {
+        sums.sorted_by_key(|k| Reverse(*k)).take(3).sum()
+    })?;
+    Ok(results)
 }
 
-fn parse(input: &str) -> Result<Vec<u32>, anyhow::Error> {
-    input
-        .split(DOUBLE_LINE_ENDING)
-        .map(parse_and_sum)
-        .collect::<Result<Vec<u32>, _>>()
-        .context("Failed to parse input text")
+fn parse(input: &str) -> impl Iterator<Item = Result<u32, ParseIntError>> + '_ {
+    input.split(DOUBLE_LINE_ENDING).map(parse_and_sum)
 }
 
 fn parse_and_sum(s: &str) -> Result<u32, ParseIntError> {

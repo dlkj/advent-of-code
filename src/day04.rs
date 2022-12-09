@@ -1,32 +1,26 @@
 use crate::day04::parser::parse;
 use std::ops::RangeInclusive;
 
-use itertools::Itertools;
+use itertools::{process_results, Itertools};
 
 const INPUT: &str = include_str!("../resources/input04.txt");
 
-pub fn solve_part_a() -> Result<u32, anyhow::Error> {
+pub fn solve_part_a() -> Result<usize, anyhow::Error> {
     part_a(INPUT)
 }
 
-pub fn solve_part_b() -> Result<u32, anyhow::Error> {
+pub fn solve_part_b() -> Result<usize, anyhow::Error> {
     part_b(INPUT)
 }
 
-fn part_a(input: &str) -> Result<u32, anyhow::Error> {
-    input
-        .lines()
-        .map(parse)
-        .filter_ok(contains)
-        .fold_ok(0, |a, _| a + 1)
+fn part_a(input: &str) -> Result<usize, anyhow::Error> {
+    #[allow(clippy::redundant_closure_for_method_calls)]
+    process_results(input.lines().map(parse).filter_ok(contains), |i| i.count())
 }
 
-fn part_b(input: &str) -> Result<u32, anyhow::Error> {
-    input
-        .lines()
-        .map(parse)
-        .filter_ok(overlaps)
-        .fold_ok(0, |a, _| a + 1)
+fn part_b(input: &str) -> Result<usize, anyhow::Error> {
+    #[allow(clippy::redundant_closure_for_method_calls)]
+    process_results(input.lines().map(parse).filter_ok(overlaps), |i| i.count())
 }
 
 fn contains((a, b): &(RangeInclusive<u32>, RangeInclusive<u32>)) -> bool {
