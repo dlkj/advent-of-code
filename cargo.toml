@@ -10,6 +10,7 @@ license = "BSD-2-Clause"
 anyhow = "1.0"
 itertools = "0.10"
 nom = "7.1"
+num = "0.4"
 
 [dev-dependencies]
 criterion = "0.4"

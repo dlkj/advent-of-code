@@ -42,5 +42,10 @@ fn main() -> Result<(), anyhow::Error> {
         day08::solve_part_a(),
         day08::solve_part_b()
     );
+    println!(
+        "day09: {}, {}",
+        day09::solve_part_a()?,
+        day09::solve_part_b()?
+    );
     Ok(())
 }
