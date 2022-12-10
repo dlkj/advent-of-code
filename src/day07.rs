@@ -100,7 +100,7 @@ mod parser {
         IResult,
     };
 
-    use crate::{dec_int, final_parser};
+    use crate::{dec_uint, final_parser};
 
     use super::{ListLine, TerminalLine};
 
@@ -136,7 +136,7 @@ mod parser {
         preceded(tag("dir "), not_line_ending)(input)
     }
     fn file(input: &str) -> IResult<&str, (usize, &str)> {
-        separated_pair(dec_int, tag(" "), not_line_ending)(input)
+        separated_pair(dec_uint, tag(" "), not_line_ending)(input)
     }
 }
 
@@ -147,13 +147,13 @@ mod tests {
 
     #[test]
     fn example_a() -> Result<(), anyhow::Error> {
-        assert_eq!(part_a(EXAMPLE)?, 95437);
+        assert_eq!(part_a(EXAMPLE).unwrap(), 95437);
         Ok(())
     }
 
     #[test]
     fn example_b() -> Result<(), anyhow::Error> {
-        assert_eq!(part_b(EXAMPLE)?, 24933642);
+        assert_eq!(part_b(EXAMPLE).unwrap(), 24933642);
         Ok(())
     }
 }

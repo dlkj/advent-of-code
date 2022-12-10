@@ -1,4 +1,11 @@
-use nom::{character::complete::digit1, combinator::map_res, error::Error, IResult, Parser};
+use nom::{
+    bytes::complete::tag,
+    character::complete::digit1,
+    combinator::{map_res, opt, recognize},
+    error::Error,
+    sequence::pair,
+    IResult, Parser,
+};
 
 pub mod day01;
 pub mod day02;
@@ -9,6 +16,7 @@ pub mod day06;
 pub mod day07;
 pub mod day08;
 pub mod day09;
+pub mod day10;
 
 #[cfg(windows)]
 const DOUBLE_LINE_ENDING: &str = "\r\n\r\n";
@@ -27,7 +35,14 @@ pub fn final_parser<'a, R>(
     }
 }
 
-pub fn dec_int<R>(input: &str) -> IResult<&str, R>
+pub fn dec_iint<R>(input: &str) -> IResult<&str, R>
+where
+    R: std::str::FromStr,
+{
+    map_res(recognize(pair(opt(tag("-")), digit1)), str::parse)(input)
+}
+
+pub fn dec_uint<R>(input: &str) -> IResult<&str, R>
 where
     R: std::str::FromStr,
 {

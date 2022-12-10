@@ -68,13 +68,13 @@ mod tests {
 
     #[test]
     fn example_a() -> Result<(), anyhow::Error> {
-        assert_eq!(part_a(EXAMPLE)?, 157);
+        assert_eq!(part_a(EXAMPLE).unwrap(), 157);
         Ok(())
     }
 
     #[test]
     fn example_b() -> Result<(), anyhow::Error> {
-        assert_eq!(part_b(EXAMPLE)?, 70);
+        assert_eq!(part_b(EXAMPLE).unwrap(), 70);
         Ok(())
     }
 }

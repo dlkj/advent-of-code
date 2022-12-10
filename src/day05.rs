@@ -88,7 +88,7 @@ mod parser {
     use nom::AsChar;
     use nom::{bytes::complete::tag, sequence::delimited, IResult};
 
-    use crate::{dec_int, final_parser};
+    use crate::{dec_uint, final_parser};
 
     use super::{Crate, Instruction};
 
@@ -145,11 +145,11 @@ mod parser {
     fn instruction(input: &str) -> IResult<&str, Instruction> {
         let (input, (_, count, _, from, _, to)) = tuple((
             tag("move "),
-            dec_int,
+            dec_uint,
             tag(" from "),
-            dec_int,
+            dec_uint,
             tag(" to "),
-            dec_int,
+            dec_uint,
         ))(input)?;
 
         Ok((input, Instruction { count, from, to }))
@@ -163,13 +163,13 @@ mod tests {
 
     #[test]
     fn example_a() -> Result<(), anyhow::Error> {
-        assert_eq!(part_a(EXAMPLE)?, "CMZ");
+        assert_eq!(part_a(EXAMPLE).unwrap(), "CMZ");
         Ok(())
     }
 
     #[test]
     fn example_b() -> Result<(), anyhow::Error> {
-        assert_eq!(part_b(EXAMPLE)?, "MCD");
+        assert_eq!(part_b(EXAMPLE).unwrap(), "MCD");
         Ok(())
     }
 }

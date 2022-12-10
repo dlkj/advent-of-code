@@ -40,7 +40,7 @@ mod parser {
 
     use nom::{bytes::complete::tag, combinator::map, sequence::separated_pair, IResult};
 
-    use crate::{dec_int, final_parser};
+    use crate::{dec_uint, final_parser};
 
     pub(super) fn parse(
         input: &str,
@@ -53,7 +53,7 @@ mod parser {
     }
 
     fn range(input: &str) -> IResult<&str, RangeInclusive<u32>> {
-        map(separated_pair(dec_int, tag("-"), dec_int), |(a, b)| {
+        map(separated_pair(dec_uint, tag("-"), dec_uint), |(a, b)| {
             RangeInclusive::new(a, b)
         })(input)
     }
@@ -66,13 +66,13 @@ mod tests {
 
     #[test]
     fn example_a() -> Result<(), anyhow::Error> {
-        assert_eq!(part_a(EXAMPLE)?, 2);
+        assert_eq!(part_a(EXAMPLE).unwrap(), 2);
         Ok(())
     }
 
     #[test]
     fn example_b() -> Result<(), anyhow::Error> {
-        assert_eq!(part_b(EXAMPLE)?, 4);
+        assert_eq!(part_b(EXAMPLE).unwrap(), 4);
         Ok(())
     }
 }

@@ -44,13 +44,13 @@ mod tests {
 
     #[test]
     fn example_a() -> Result<(), anyhow::Error> {
-        assert_eq!(part_a(EXAMPLE)?, 7);
+        assert_eq!(part_a(EXAMPLE).unwrap(), 7);
         Ok(())
     }
 
     #[test]
     fn example_b() -> Result<(), anyhow::Error> {
-        assert_eq!(part_b(EXAMPLE)?, 19);
+        assert_eq!(part_b(EXAMPLE).unwrap(), 19);
         Ok(())
     }
 }

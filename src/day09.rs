@@ -83,7 +83,7 @@ mod parser {
         multi::separated_list1, sequence::separated_pair, IResult,
     };
 
-    use crate::{dec_int, final_parser};
+    use crate::{dec_uint, final_parser};
 
     use super::Direction;
 
@@ -92,7 +92,7 @@ mod parser {
     }
 
     fn line(input: &str) -> IResult<&str, (Direction, u32)> {
-        separated_pair(direction, tag(" "), dec_int)(input)
+        separated_pair(direction, tag(" "), dec_uint)(input)
     }
 
     fn direction(input: &str) -> IResult<&str, Direction> {
@@ -112,13 +112,13 @@ mod tests {
 
     #[test]
     fn example_a() -> Result<(), anyhow::Error> {
-        assert_eq!(part_a(EXAMPLE)?, 13);
+        assert_eq!(part_a(EXAMPLE).unwrap(), 13);
         Ok(())
     }
 
     #[test]
     fn example_b() -> Result<(), anyhow::Error> {
-        assert_eq!(part_b(EXAMPLE)?, 1);
+        assert_eq!(part_b(EXAMPLE).unwrap(), 1);
         Ok(())
     }
 }
