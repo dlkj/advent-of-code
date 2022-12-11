@@ -1,7 +1,9 @@
 use std::vec;
 
 use itertools::process_results;
-use nom::{combinator::iterator, Parser};
+use nom::combinator::iterator;
+
+use crate::finish_parser_it;
 
 const INPUT: &str = include_str!("../resources/input10.txt");
 
@@ -32,7 +34,7 @@ fn part_a(input: &str) -> Result<i32, anyhow::Error> {
         |i| i.sum(),
     );
 
-    finish(instructions)?;
+    finish_parser_it(instructions)?;
 
     result
 }
@@ -62,7 +64,7 @@ fn part_b(input: &str) -> Result<String, anyhow::Error> {
         |i| i.collect(),
     );
 
-    finish(instructions)?;
+    finish_parser_it(instructions)?;
 
     result
 }
@@ -83,23 +85,6 @@ fn register_values(input: impl Iterator<Item = Instruction>) -> impl Iterator<It
             };
             Some(current)
         })
-}
-
-fn finish<'a, O, F>(
-    parse_it: nom::combinator::ParserIterator<&'a str, nom::error::Error<&'a str>, F>,
-) -> Result<(), anyhow::Error>
-where
-    F: Parser<&'a str, O, nom::error::Error<&'a str>>,
-{
-    let (input, _) = parse_it
-        .finish()
-        .map_err(nom::Err::<nom::error::Error<&str>>::to_owned)?;
-
-    if input.trim().is_empty() {
-        Ok(())
-    } else {
-        Err(anyhow::anyhow!("unparsed data"))
-    }
 }
 
 mod parser {

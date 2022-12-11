@@ -17,6 +17,7 @@ pub mod day07;
 pub mod day08;
 pub mod day09;
 pub mod day10;
+pub mod day11;
 
 #[cfg(windows)]
 const DOUBLE_LINE_ENDING: &str = "\r\n\r\n";
@@ -32,6 +33,23 @@ pub fn final_parser<'a, R>(
             .map(|(_, r)| r)
             .map_err(nom::Err::<nom::error::Error<&str>>::to_owned)?;
         Ok(r)
+    }
+}
+
+pub fn finish_parser_it<'a, O, F>(
+    parse_it: nom::combinator::ParserIterator<&'a str, nom::error::Error<&'a str>, F>,
+) -> Result<(), anyhow::Error>
+where
+    F: Parser<&'a str, O, nom::error::Error<&'a str>>,
+{
+    let (input, _) = parse_it
+        .finish()
+        .map_err(nom::Err::<nom::error::Error<&str>>::to_owned)?;
+
+    if input.trim().is_empty() {
+        Ok(())
+    } else {
+        Err(anyhow::anyhow!("unparsed data"))
     }
 }
 
