@@ -18,9 +18,9 @@ impl From<Crate> for char {
 
 #[derive(Debug, Clone, Copy)]
 struct Instruction {
-    pub count: usize,
-    pub from: usize,
-    pub to: usize,
+    pub count: u32,
+    pub from: u32,
+    pub to: u32,
 }
 
 pub fn solve_part_a() -> Result<String, anyhow::Error> {
@@ -36,10 +36,10 @@ fn part_a(input: &str) -> Result<String, anyhow::Error> {
 
     for i in instructions {
         for _ in 0..i.count {
-            let c = locations[i.from - 1]
+            let c = locations[i.from as usize - 1]
                 .pop()
                 .ok_or_else(|| anyhow!("Tried to pop an empty stack of crates"))?;
-            locations[i.to - 1].push(c);
+            locations[i.to as usize - 1].push(c);
         }
     }
 
@@ -50,9 +50,9 @@ fn part_b(input: &str) -> Result<String, anyhow::Error> {
     let (mut locations, instructions) = parse_input(input)?;
 
     for i in instructions {
-        let from = &mut locations[i.from - 1];
-        let moving_crates = from.drain(from.len() - i.count..).collect_vec();
-        locations[i.to - 1].extend(moving_crates);
+        let from = &mut locations[i.from as usize - 1];
+        let moving_crates = from.drain(from.len() - i.count as usize..).collect_vec();
+        locations[i.to as usize - 1].extend(moving_crates);
     }
 
     Ok(read_top_crates(locations))
@@ -82,13 +82,14 @@ mod parser {
     use nom::branch::alt;
     use nom::character::complete::line_ending;
     use nom::character::complete::satisfy;
+    use nom::character::complete::u32;
     use nom::combinator::{map, value};
     use nom::multi::separated_list1;
     use nom::sequence::tuple;
     use nom::AsChar;
     use nom::{bytes::complete::tag, sequence::delimited, IResult};
 
-    use crate::{dec_uint, final_parser};
+    use crate::final_parser;
 
     use super::{Crate, Instruction};
 
@@ -143,14 +144,8 @@ mod parser {
     }
 
     fn instruction(input: &str) -> IResult<&str, Instruction> {
-        let (input, (_, count, _, from, _, to)) = tuple((
-            tag("move "),
-            dec_uint,
-            tag(" from "),
-            dec_uint,
-            tag(" to "),
-            dec_uint,
-        ))(input)?;
+        let (input, (_, count, _, from, _, to)) =
+            tuple((tag("move "), u32, tag(" from "), u32, tag(" to "), u32))(input)?;
 
         Ok((input, Instruction { count, from, to }))
     }

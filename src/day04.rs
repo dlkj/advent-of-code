@@ -38,9 +38,12 @@ fn overlaps((a, b): &(RangeInclusive<u32>, RangeInclusive<u32>)) -> bool {
 mod parser {
     use std::ops::RangeInclusive;
 
-    use nom::{bytes::complete::tag, combinator::map, sequence::separated_pair, IResult};
+    use nom::{
+        bytes::complete::tag, character::complete::u32, combinator::map, sequence::separated_pair,
+        IResult,
+    };
 
-    use crate::{dec_uint, final_parser};
+    use crate::final_parser;
 
     pub(super) fn parse(
         input: &str,
@@ -53,7 +56,7 @@ mod parser {
     }
 
     fn range(input: &str) -> IResult<&str, RangeInclusive<u32>> {
-        map(separated_pair(dec_uint, tag("-"), dec_uint), |(a, b)| {
+        map(separated_pair(u32, tag("-"), u32), |(a, b)| {
             RangeInclusive::new(a, b)
         })(input)
     }

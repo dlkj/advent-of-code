@@ -12,35 +12,35 @@ enum TerminalLine<'a> {
 
 #[derive(Debug, Clone, Copy)]
 enum ListLine<'a> {
-    File(usize, &'a str),
+    File(u32, &'a str),
     Directory(&'a str),
 }
 
-pub fn solve_part_a() -> Result<usize, anyhow::Error> {
+pub fn solve_part_a() -> Result<u32, anyhow::Error> {
     part_a(INPUT)
 }
 
-pub fn solve_part_b() -> Result<usize, anyhow::Error> {
+pub fn solve_part_b() -> Result<u32, anyhow::Error> {
     part_b(INPUT)
 }
 
-fn part_a(input: &str) -> Result<usize, anyhow::Error> {
+fn part_a(input: &str) -> Result<u32, anyhow::Error> {
     let sizes = get_dir_sizes(input)?;
 
     Ok(sizes.into_iter().filter(|&s| s <= 100_000).sum())
 }
 
-fn part_b(input: &str) -> Result<usize, anyhow::Error> {
+fn part_b(input: &str) -> Result<u32, anyhow::Error> {
     let sizes = get_dir_sizes(input)?;
 
     let to_free = sizes[sizes.len() - 1] - 40_000_000;
 
     Ok(sizes
         .into_iter()
-        .fold(usize::MAX, |a, b| if b > to_free { a.min(b) } else { a }))
+        .fold(u32::MAX, |a, b| if b > to_free { a.min(b) } else { a }))
 }
 
-fn get_dir_sizes(input: &str) -> Result<Vec<usize>, anyhow::Error> {
+fn get_dir_sizes(input: &str) -> Result<Vec<u32>, anyhow::Error> {
     let lines = parse(input)?;
     let mut sizes = Vec::new();
     let mut current_total = 0;
@@ -79,7 +79,7 @@ fn get_dir_sizes(input: &str) -> Result<Vec<usize>, anyhow::Error> {
     Ok(sizes)
 }
 
-fn file_size_sum(list_items: Vec<ListLine>) -> usize {
+fn file_size_sum(list_items: Vec<ListLine>) -> u32 {
     list_items
         .into_iter()
         .map(|i| match i {
@@ -93,14 +93,14 @@ mod parser {
     use nom::{
         branch::alt,
         bytes::complete::tag,
-        character::complete::{line_ending, not_line_ending},
+        character::complete::{line_ending, not_line_ending, u32},
         combinator::map,
         multi::separated_list1,
         sequence::{preceded, separated_pair, terminated},
         IResult,
     };
 
-    use crate::{dec_uint, final_parser};
+    use crate::final_parser;
 
     use super::{ListLine, TerminalLine};
 
@@ -135,8 +135,8 @@ mod parser {
     fn directory(input: &str) -> IResult<&str, &str> {
         preceded(tag("dir "), not_line_ending)(input)
     }
-    fn file(input: &str) -> IResult<&str, (usize, &str)> {
-        separated_pair(dec_uint, tag(" "), not_line_ending)(input)
+    fn file(input: &str) -> IResult<&str, (u32, &str)> {
+        separated_pair(u32, tag(" "), not_line_ending)(input)
     }
 }
 

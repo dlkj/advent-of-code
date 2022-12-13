@@ -1,11 +1,4 @@
-use nom::{
-    bytes::complete::tag,
-    character::complete::digit1,
-    combinator::{map_res, opt, recognize},
-    error::Error,
-    sequence::pair,
-    IResult, Parser,
-};
+use nom::{error::Error, Parser};
 
 pub mod day01;
 pub mod day02;
@@ -53,18 +46,4 @@ where
     } else {
         Err(anyhow::anyhow!(format!("unparsed data: {}", input)))
     }
-}
-
-pub fn dec_iint<R>(input: &str) -> IResult<&str, R>
-where
-    R: std::str::FromStr,
-{
-    map_res(recognize(pair(opt(tag("-")), digit1)), str::parse)(input)
-}
-
-pub fn dec_uint<R>(input: &str) -> IResult<&str, R>
-where
-    R: std::str::FromStr,
-{
-    map_res(digit1, str::parse)(input)
 }

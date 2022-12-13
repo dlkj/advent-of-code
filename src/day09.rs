@@ -79,11 +79,16 @@ fn scan_tail((tx, ty): &mut (i32, i32), (hx, hy): (i32, i32)) -> Option<(i32, i3
 
 mod parser {
     use nom::{
-        branch::alt, bytes::complete::tag, character::complete::line_ending, combinator::value,
-        multi::separated_list1, sequence::separated_pair, IResult,
+        branch::alt,
+        bytes::complete::tag,
+        character::complete::{line_ending, u32},
+        combinator::value,
+        multi::separated_list1,
+        sequence::separated_pair,
+        IResult,
     };
 
-    use crate::{dec_uint, final_parser};
+    use crate::final_parser;
 
     use super::Direction;
 
@@ -92,7 +97,7 @@ mod parser {
     }
 
     fn line(input: &str) -> IResult<&str, (Direction, u32)> {
-        separated_pair(direction, tag(" "), dec_uint)(input)
+        separated_pair(direction, tag(" "), u32)(input)
     }
 
     fn direction(input: &str) -> IResult<&str, Direction> {

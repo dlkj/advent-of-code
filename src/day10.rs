@@ -91,13 +91,11 @@ mod parser {
     use nom::{
         branch::alt,
         bytes::complete::tag,
-        character::complete::line_ending,
+        character::complete::{i32, line_ending},
         combinator::{eof, map, value},
         sequence::{preceded, terminated},
         IResult,
     };
-
-    use crate::dec_iint;
 
     use super::Instruction;
 
@@ -107,7 +105,7 @@ mod parser {
 
     fn instruction(input: &str) -> IResult<&str, Instruction> {
         let noop = value(Instruction::Noop, tag("noop"));
-        let addx = map(preceded(tag("addx "), dec_iint), Instruction::AddX);
+        let addx = map(preceded(tag("addx "), i32), Instruction::AddX);
 
         alt((noop, addx))(input)
     }
