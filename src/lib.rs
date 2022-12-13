@@ -19,6 +19,7 @@ pub mod day09;
 pub mod day10;
 pub mod day11;
 pub mod day12;
+pub mod day13;
 
 #[cfg(windows)]
 const DOUBLE_LINE_ENDING: &str = "\r\n\r\n";
@@ -50,7 +51,7 @@ where
     if input.trim().is_empty() {
         Ok(())
     } else {
-        Err(anyhow::anyhow!("unparsed data"))
+        Err(anyhow::anyhow!(format!("unparsed data: {}", input)))
     }
 }
 
