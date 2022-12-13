@@ -1,4 +1,4 @@
-use std::collections::{BinaryHeap, HashMap};
+use std::collections::BinaryHeap;
 
 use anyhow::anyhow;
 use itertools::Itertools;
@@ -38,8 +38,8 @@ fn part_a(input: &str) -> Result<u32, anyhow::Error> {
 
     a_star(
         &input,
-        (u32::try_from(start_x)?, u32::try_from(start_y)?),
         (u32::try_from(end_x)?, u32::try_from(end_y)?),
+        (u32::try_from(start_x)?, u32::try_from(start_y)?),
     )
 }
 
@@ -59,21 +59,15 @@ fn part_b(input: &str) -> Result<u32, anyhow::Error> {
         .map(|l| l.chars().map(u32::from).collect_vec())
         .collect_vec();
 
+    let steps = bfs(&input, (u32::try_from(end_x)?, u32::try_from(end_y)?));
+
     // process_results(
     input
         .iter()
         .enumerate()
         .flat_map(|(y, r)| r.iter().enumerate().map(move |(x, c)| (x, y, *c)))
         .filter(|(_, _, c)| *c == 'a' as u32)
-        // .inspect(|x| println!("{:?}", x))
-        .map(|(x, y, _)| {
-            a_star(
-                &input,
-                (u32::try_from(x)?, u32::try_from(y)?),
-                (u32::try_from(end_x)?, u32::try_from(end_y)?),
-            )
-        })
-        .filter_map(std::result::Result::ok)
+        .filter_map(|(x, y, _)| steps[y][x])
         .min()
         .ok_or_else(|| anyhow!("No routes found"))
 }
@@ -110,8 +104,14 @@ fn a_star(input: &[Vec<u32>], start: (u32, u32), end: (u32, u32)) -> Result<u32,
         height: input[start.1 as usize][start.0 as usize],
     };
 
-    let mut cheapest = HashMap::new();
-    cheapest.insert((0, 0), 0);
+    let (start_x, start_y) = start;
+
+    let mut cheapest = input
+        .iter()
+        .map(|r| r.iter().map(|_| None).collect_vec())
+        .collect_vec();
+
+    cheapest[start_y as usize][start_x as usize] = Some(0);
 
     while candidate.coordinates != end {
         // for _ in 0..10 {
@@ -153,18 +153,80 @@ fn a_star(input: &[Vec<u32>], start: (u32, u32), end: (u32, u32)) -> Result<u32,
     Ok(candidate.steps)
 }
 
+fn bfs(input: &[Vec<u32>], start: (u32, u32)) -> Vec<Vec<Option<u32>>> {
+    let mut candidates = BinaryHeap::new();
+
+    let mut candidate = Location {
+        coordinates: start,
+        last: start,
+        steps: 0,
+        distance: 0,
+        height: input[start.1 as usize][start.0 as usize],
+    };
+
+    let (start_x, start_y) = start;
+
+    let mut cheapest = input
+        .iter()
+        .map(|r| r.iter().map(|_| None).collect_vec())
+        .collect_vec();
+
+    cheapest[start_y as usize][start_x as usize] = Some(0);
+
+    loop {
+        // for _ in 0..10 {
+        let (x, y) = candidate.coordinates;
+
+        //up
+        if x > 0 {
+            if let Some(l) = get_step(candidate, (x - 1, y), (x - 1, y), input) {
+                replace_or_push(&mut cheapest, &mut candidates, l);
+            }
+        }
+
+        //down
+        if (x as usize) < (input[0].len() - 1) {
+            if let Some(l) = get_step(candidate, (x + 1, y), (x + 1, y), input) {
+                replace_or_push(&mut cheapest, &mut candidates, l);
+            }
+        }
+
+        //left
+        if y > 0 {
+            if let Some(l) = get_step(candidate, (x, y - 1), (x, y - 1), input) {
+                replace_or_push(&mut cheapest, &mut candidates, l);
+            }
+        }
+
+        //right
+        if (y as usize) < (input.len() - 1) {
+            if let Some(l) = get_step(candidate, (x, y + 1), (x, y + 1), input) {
+                replace_or_push(&mut cheapest, &mut candidates, l);
+            }
+        }
+
+        if let Some(c) = candidates.pop() {
+            candidate = c;
+        } else {
+            return cheapest;
+        }
+    }
+}
+
 fn replace_or_push(
-    cheapest: &mut HashMap<(u32, u32), u32>,
+    cheapest: &mut [Vec<Option<u32>>],
     candidates: &mut BinaryHeap<Location>,
     l: Location,
 ) {
-    if let Some(&c) = cheapest.get(&l.coordinates) {
+    let (x, y) = l.coordinates;
+
+    if let Some(c) = cheapest[y as usize][x as usize] {
         if l.steps >= c {
             return;
         }
     }
     candidates.push(l);
-    cheapest.insert(l.coordinates, l.steps);
+    cheapest[y as usize][x as usize] = Some(l.steps);
 }
 
 fn get_step(
@@ -175,7 +237,7 @@ fn get_step(
 ) -> Option<Location> {
     let next_height = input[next_y as usize][next_x as usize];
 
-    if candidate.last != (next_x, next_y) && (candidate.height + 1) >= next_height {
+    if candidate.last != (next_x, next_y) && (candidate.height) <= (next_height + 1) {
         Some(Location {
             coordinates: (next_x, next_y),
             last: candidate.coordinates,
