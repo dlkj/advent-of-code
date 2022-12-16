@@ -98,10 +98,10 @@ fn part_b(input: &str, max_val: i32) -> Result<u64, anyhow::Error> {
         .find_first(|_| true);
 
     let (x, y) = result.ok_or_else(|| anyhow::anyhow!("Not beacon found"))?;
-    return Ok(u64::try_from(x)? * 4_000_000 + u64::try_from(y)?);
+    Ok(u64::try_from(x)? * 4_000_000 + u64::try_from(y)?)
 }
 
-fn find_beacon(sensors: &Vec<Sensor>, target_y: i32, max_val: i32) -> Option<(i32, i32)> {
+fn find_beacon(sensors: &[Sensor], target_y: i32, max_val: i32) -> Option<(i32, i32)> {
     let ranges = sensors
         .iter()
         .filter_map(|s| s.range_at(target_y))
