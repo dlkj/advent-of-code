@@ -16,7 +16,7 @@ pub fn solve_part_b() -> Result<u32, anyhow::Error> {
 
 fn part_a(input: &str) -> Result<u32, anyhow::Error> {
     let solutions = calc_solutions(input, 30)?;
-    Ok(solutions.values().cloned().max().unwrap_or(0))
+    Ok(solutions.values().copied().max().unwrap_or(0))
 }
 
 fn calc_solutions(
@@ -30,16 +30,15 @@ fn calc_solutions(
         .iter()
         .map(|(&s, &i)| (1u64 << i, valves[s].flow_rate))
         .collect();
-    let mut max_preasure = Vec::new();
-    max_preasure.extend((0..max_time).into_iter().map(|_| HashMap::new()));
+    let mut max_preasure = HashMap::new();
     let v = &valves["AA"];
-    max_preasure[0].insert((v.name, 1u64 << v_idx[v.name]), 0);
+    max_preasure.insert((v.name, 1u64 << v_idx[v.name]), 0);
     for &t in &v.tunnels {
-        max_preasure[0].insert((t, 0), 0);
+        max_preasure.insert((t, 0), 0);
     }
-    for time in 0..(max_time - 1) {
-        //println!("t:{} len:{}", time, max_preasure[time].len());
-        for ((v_name, opened), presure) in max_preasure[time].clone() {
+    for _ in 0..(max_time - 1) {
+        let mut next_max_preasure: HashMap<(&str, u64), u32> = HashMap::new();
+        for ((v_name, opened), presure) in max_preasure {
             let v = &valves[v_name];
             let next_presure = flows
                 .iter()
@@ -47,7 +46,7 @@ fn calc_solutions(
                 .sum::<u32>()
                 + presure;
 
-            let next_mp = &mut max_preasure[time + 1];
+            let next_mp = &mut next_max_preasure;
 
             // turn on valve
             let mask = 1 << v_idx[v.name];
@@ -73,20 +72,28 @@ fn calc_solutions(
                 );
             }
         }
+        max_preasure = next_max_preasure;
     }
-    Ok(max_preasure.pop().unwrap_or_else(HashMap::new))
+    Ok(max_preasure)
 }
 
 fn part_b(input: &str) -> Result<u32, anyhow::Error> {
     let solutions = calc_solutions(input, 26)?;
 
-    let min = solutions.values().cloned().max().unwrap_or(0);
-
-    let foo = solutions
+    let groups = solutions
         .iter()
         .map(|(&(_, o), &p)| (o, p))
-        .filter(|&(_, p)| p > min / 2)
-        .unique()
+        .sorted_unstable_by_key(|&(o, _)| o)
+        .group_by(|&(o, _)| o);
+
+    let max_by_open = groups
+        .into_iter()
+        .map(|(o, p)| (o, p.map(|(_, p)| p).max().unwrap_or(0)))
+        .filter(|&(o, p)| o != 0 && p != 0)
+        .collect_vec();
+
+    let result = max_by_open
+        .into_iter()
         .tuple_combinations()
         .filter_map(
             |((o1, p1), (o2, p2))| {
@@ -99,7 +106,7 @@ fn part_b(input: &str) -> Result<u32, anyhow::Error> {
         )
         .max();
 
-    Ok(foo.unwrap_or(0))
+    Ok(result.unwrap_or(0))
 }
 
 #[derive(Debug)]
