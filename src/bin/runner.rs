@@ -3,6 +3,11 @@ use advent_of_code_2022::*;
 
 fn main() -> Result<(), anyhow::Error> {
     println!(
+        "day17: {}, {}",
+        day17::solve_part_a()?,
+        day17::solve_part_b()?
+    );
+    println!(
         "day16: {}, {}",
         day16::solve_part_a()?,
         day16::solve_part_b()?
